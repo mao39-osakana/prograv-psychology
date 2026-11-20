@@ -803,7 +803,12 @@
 
     if (c.type === "quiz") bindQuiz();
     if (c.type === "done"){
+      var pgWasRead = isRead(activeItem);
       markRead(activeItem);
+      if (!pgWasRead && window.PGTrack){
+        PGTrack.send({site:"心理学", kind:"読了", itemId: activeItem.no, itemName: activeItem.theme});
+        if (quizAnswered) PGTrack.send({site:"心理学", kind:"クイズ", itemId: activeItem.no, itemName: activeItem.theme, score: quizCorrect ? 1 : 0});
+      }
       var rb = document.getElementById("restartBtn");
       if (rb) rb.addEventListener("click", function(e){ e.stopPropagation(); goTo(0, "prev"); });
       var lb = document.getElementById("toListBtn");
@@ -910,6 +915,24 @@
   });
 
   showHub();
+})();
+</script>
+
+<script>
+/* PRO-GRAV 学習記録（LINEログイン連携） */
+(function(){
+  var API = 'https://prograv-learn.sprout-and.workers.dev';
+  try {
+    var lt = new URLSearchParams(location.hash.slice(1)).get('lt');
+    if (lt) { localStorage.setItem('prograv_lt', lt); history.replaceState(null, '', location.pathname + location.search); }
+  } catch(e){}
+  function pgToken(){ try { return localStorage.getItem('prograv_lt') || ''; } catch(e){ return ''; } }
+  window.PGTrack = {
+    send: function(ev){
+      var t = pgToken(); if (!t) return;
+      try { fetch(API + '/api/progress', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }, body: JSON.stringify(ev) }).catch(function(){}); } catch(e){}
+    }
+  };
 })();
 </script>
 </body>

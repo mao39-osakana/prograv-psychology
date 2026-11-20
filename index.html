@@ -983,21 +983,57 @@ try { var __pgLt = new URLSearchParams(location.hash.slice(1)).get('lt'); if (__
     if (deck && !deck.hidden && back) back.click();
     window.scrollTo(0, 0);
   });
+  function checkMe(t){
+    fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + t } })
+      .then(function(r){ if (r.status === 403) return { notEligible: true }; return r.ok ? r.json() : null; })
+      .then(function(j){
+        if (j && j.notEligible) { showGate('この教材は、ご契約後にご覧いただけます。ご契約の状況については、トレーナーにお問い合わせください', true); return; }
+        if (j && j.result) {
+          document.documentElement.classList.remove('pg-locked');
+          showMemberName(j.result);
+        } else {
+          try { localStorage.removeItem('prograv_lt'); } catch(e){}
+          showGate('ログインの有効期限が切れています。再度ログインをお願いします');
+        }
+      })
+      .catch(function(){ showGate('通信エラーが発生しました。電波の良い場所でもう一度開いてください'); });
+  }
+  var LIFF_ID = '2012731779-e0AgIgsJ';
+  function tryLiff(){
+    var done = false;
+    function fallback(){ if (!done) { done = true; showGate('学習の記録のため、LINEログインをお願いしています'); } }
+    var sc = document.createElement('script');
+    sc.src = 'https://static.line-scdn.net/liff/edge/2/sdk.js';
+    sc.onerror = fallback;
+    sc.onload = function(){
+      try {
+        liff.init({ liffId: LIFF_ID }).then(function(){
+          if (!liff.isInClient() || !liff.isLoggedIn()) { fallback(); return; }
+          var at = liff.getAccessToken();
+          if (!at) { fallback(); return; }
+          fetch(API + '/api/liff-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accessToken: at }) })
+            .then(function(r){ return r.json().then(function(j){ return { status: r.status, j: j }; }); })
+            .then(function(x){
+              if (x.status === 200 && x.j && x.j.result && x.j.result.token) {
+                done = true;
+                try { localStorage.setItem('prograv_lt', x.j.result.token); } catch(e){}
+                checkMe(x.j.result.token);
+              } else if (x.j && x.j.error === 'not_linked') {
+                done = true; showGate('まだ連携が完了していません。トレーナーから届いた招待リンクを開いて、連携を完了してください', true);
+              } else if (x.j && x.j.error === 'not_eligible') {
+                done = true; showGate('この教材は、ご契約後にご覧いただけます。ご契約の状況については、トレーナーにお問い合わせください', true);
+              } else { fallback(); }
+            })
+            .catch(fallback);
+        }).catch(fallback);
+      } catch(e){ fallback(); }
+    };
+    document.head.appendChild(sc);
+  }
   var t = pgToken();
-  if (!t) { showGate('学習の記録のため、LINEログインをお願いしています'); return; }
-  fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + t } })
-    .then(function(r){ if (r.status === 403) return { notEligible: true }; return r.ok ? r.json() : null; })
-    .then(function(j){
-      if (j && j.notEligible) { showGate('この教材は、ご契約後にご覧いただけます。ご契約の状況については、トレーナーにお問い合わせください', true); return; }
-      if (j && j.result) {
-        document.documentElement.classList.remove('pg-locked');
-        showMemberName(j.result);
-      } else {
-        try { localStorage.removeItem('prograv_lt'); } catch(e){}
-        showGate('ログインの有効期限が切れています。再度ログインをお願いします');
-      }
-    })
-    .catch(function(){ showGate('通信エラーが発生しました。電波の良い場所でもう一度開いてください'); });
+  if (t) { checkMe(t); return; }
+  if (navigator.userAgent.indexOf(' Line/') >= 0) { tryLiff(); return; }
+  showGate('学習の記録のため、LINEログインをお願いしています');
 })();
 </script>
 </body>

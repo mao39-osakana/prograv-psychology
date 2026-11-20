@@ -116,8 +116,8 @@
     /* 進捗表示＋カード＋前へ/次へボタンがスクロールなしで画面に収まる高さ。
        上下の固定要素（戻るリンク・進捗・ナビ等）の合計は約230px＋余裕分 */
     height:600px;
-    height:min(600px, calc(100vh - 240px));
-    height:min(600px, calc(100dvh - 240px));
+    height:min(600px, calc(100vh - 288px));
+    height:min(600px, calc(100dvh - 288px));
     /* カード内スクロールはしない。本文は表示領域に収まる分量で分割する */
     overflow:hidden;
     display:flex;flex-direction:column;
@@ -249,7 +249,7 @@
     .deck{margin-top:10px}
     .nav{margin-top:10px}
     .nav-hint{display:none}
-    .card{height:calc(100vh - 166px);height:calc(100dvh - 166px);padding-top:18px;padding-bottom:14px}
+    .card{height:calc(100vh - 214px);height:calc(100dvh - 214px);padding-top:18px;padding-bottom:14px}
     .kicker{margin-bottom:10px}
     .t-no{margin:2px 0 6px}
     .t-underline{margin:12px 0 16px}
@@ -257,7 +257,20 @@
     .flow{margin-top:14px;gap:6px}
     .tap-hint{padding-top:14px}
   }
+
+  /* ============ GLOBAL HEADER (KSF教材と共通) ============ */
+  .g-head{position:fixed;top:0;left:0;right:0;height:48px;z-index:60;background:var(--bg);border-bottom:1px solid rgba(128,138,160,.35)}
+  .g-head-in{max-width:560px;margin:0 auto;height:100%;padding:0 14px;display:flex;align-items:center;gap:10px}
+  .g-logo{display:inline-flex;align-items:baseline;gap:8px;background:none;border:none;padding:6px 4px;min-height:44px;color:var(--ink);cursor:pointer;font-family:inherit}
+  .g-logo .wm{font-family:'Libre Baskerville',serif;font-size:19px;font-weight:700;letter-spacing:.06em;line-height:1;padding-bottom:4px;position:relative}
+  .g-logo .wm::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3.5px;border-radius:99px;background:linear-gradient(100deg,#f6c945 0%,#f59b2e 60%,#ef7f22 100%)}
+  .g-logo .tag{font-size:11px;font-weight:700;color:#8a94a6;letter-spacing:.08em}
+  .g-crumb{margin-left:auto;font-size:11.5px;font-weight:700;color:#8a94a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body{padding-top:48px}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 <style>html.pg-locked body{visibility:hidden}html.pg-locked #pgGate{visibility:visible}</style>
 <script>
 document.documentElement.classList.add('pg-locked');
@@ -265,6 +278,15 @@ try { var __pgLt = new URLSearchParams(location.hash.slice(1)).get('lt'); if (__
 </script>
 </head>
 <body>
+<header class="g-head">
+  <div class="g-head-in">
+    <button class="g-logo" id="pgHomeBtn" aria-label="一覧に戻る">
+      <span class="wm">PRO-GRAV</span><span class="tag">教材</span>
+    </button>
+    <span class="g-crumb">小説で読む心理学</span>
+  </div>
+</header>
+
 <main class="wrap">
 
   <!-- ===== hub view ===== -->
@@ -956,14 +978,21 @@ try { var __pgLt = new URLSearchParams(location.hash.slice(1)).get('lt'); if (__
   function showMemberName(r){
     var label = (r.surname || (r.name || '').split(/[\s　]/)[0] || '');
     if (!label) return;
-    var host = document.querySelector('main.wrap');
+    var host = document.querySelector('.g-head-in');
     if (!host || document.getElementById('pgMemberName')) return;
-    var el = document.createElement('div');
+    var el = document.createElement('span');
     el.id = 'pgMemberName';
-    el.style.cssText = 'text-align:right;font-size:12px;color:#666;padding:2px 0 0';
+    el.style.cssText = 'margin-left:auto;font-size:12px;color:var(--ink);border:1px solid #b9975b;border-radius:999px;padding:3px 10px;white-space:nowrap';
     el.textContent = label + 'さん';
-    host.insertBefore(el, host.firstChild);
+    host.appendChild(el);
   }
+  var homeBtn = document.getElementById('pgHomeBtn');
+  if (homeBtn) homeBtn.addEventListener('click', function(){
+    var deck = document.getElementById('deckView');
+    var back = document.getElementById('backBtn');
+    if (deck && !deck.hidden && back) back.click();
+    window.scrollTo(0, 0);
+  });
   var t = pgToken();
   if (!t) { showGate('学習の記録のため、LINEログインをお願いしています'); return; }
   fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + t } })

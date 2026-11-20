@@ -1036,5 +1036,32 @@ try { var __pgLt = new URLSearchParams(location.hash.slice(1)).get('lt'); if (__
   showGate('学習の記録のため、LINEログインをお願いしています');
 })();
 </script>
+<script>
+/* 左端スワイプで前に戻る（LINEアプリ内ブラウザ用） */
+(function(){
+  var sx = null, sy = null, st = null;
+  document.addEventListener('touchstart', function(e){
+    if (e.touches.length === 1 && e.touches[0].clientX <= 24) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = e.target; }
+    else { sx = null; st = null; }
+  }, { passive: true });
+  document.addEventListener('touchend', function(e){
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    var dy = e.changedTouches[0].clientY - sy;
+    var target = st;
+    sx = null; st = null;
+    if (dx < 64 || Math.abs(dy) > 48) return;
+    if (document.documentElement.classList.contains('pg-locked')) return;
+    var deck = document.getElementById('deckView');
+    if (!deck || deck.hidden) return;
+    var numEl = document.getElementById('curNum');
+    var n = numEl ? (parseInt(numEl.textContent, 10) || 1) : 1;
+    var onCard = target && target.closest && target.closest('.card');
+    if (onCard && n > 1) return;
+    if (n > 1) { var p = document.getElementById('prevBtn'); if (p) p.click(); }
+    else { var b = document.getElementById('backBtn'); if (b) b.click(); }
+  }, { passive: true });
+})();
+</script>
 </body>
 </html>

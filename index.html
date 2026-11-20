@@ -258,6 +258,8 @@
     .tap-hint{padding-top:14px}
   }
 </style>
+<style>html.pg-locked body{visibility:hidden}html.pg-locked #pgGate{visibility:visible}</style>
+<script>document.documentElement.classList.add('pg-locked');</script>
 </head>
 <body>
 <main class="wrap">
@@ -919,9 +921,10 @@
 </script>
 
 <script>
-/* PRO-GRAV 学習記録（LINEログイン連携） */
+/* PRO-GRAV 学習記録＋会員ゲート（LINEログイン連携） */
 (function(){
   var API = 'https://prograv-learn.sprout-and.workers.dev';
+  var TARGET = 'psych';
   try {
     var lt = new URLSearchParams(location.hash.slice(1)).get('lt');
     if (lt) { localStorage.setItem('prograv_lt', lt); history.replaceState(null, '', location.pathname + location.search); }
@@ -933,23 +936,40 @@
       try { fetch(API + '/api/progress', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }, body: JSON.stringify(ev) }).catch(function(){}); } catch(e){}
     }
   };
-  var t = pgToken();
-  var startUrl = API + '/auth/start?target=psych';
-  function badge(html, href){
-    var el = document.createElement(href ? 'a' : 'div');
-    if (href) { el.href = href; }
-    el.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;background:#101c31;color:#fff;font-size:11px;padding:7px 12px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.25);opacity:.94;text-decoration:none';
-    el.textContent = html;
+  var startUrl = API + '/auth/start?target=' + TARGET;
+  function showGate(msg){
+    if (document.getElementById('pgGate')) return;
+    var g = document.createElement('div');
+    g.id = 'pgGate';
+    g.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#101c31;color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;visibility:visible';
+    g.innerHTML = '<div style="max-width:340px;text-align:center">'
+      + '<div style="font-size:20px;letter-spacing:.15em;margin-bottom:14px">PRO-GRAV</div>'
+      + '<p style="font-size:14px;line-height:1.8;margin:0 0 8px">この教材は会員専用です</p>'
+      + '<p style="font-size:12px;line-height:1.8;opacity:.85;margin:0 0 20px">' + msg + '</p>'
+      + '<a href="' + startUrl + '" style="display:block;background:#06C755;color:#fff;font-weight:bold;font-size:15px;padding:13px 10px;border-radius:10px;text-decoration:none">LINEでログイン</a>'
+      + '</div>';
+    document.body.appendChild(g);
+  }
+  function badge(text){
+    var el = document.createElement('div');
+    el.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;background:#101c31;color:#fff;font-size:11px;padding:7px 12px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.25);opacity:.94';
+    el.textContent = text;
     document.body.appendChild(el);
   }
-  if (!t) { badge('LINEでログインすると学習が記録されます', startUrl); return; }
+  var t = pgToken();
+  if (!t) { showGate('学習の記録のため、LINEログインをお願いしています'); return; }
   fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + t } })
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(j){
-      if (j && j.result) badge('ログイン中：' + (j.result.name || '') + '（記録しています）');
-      else badge('ログインが切れています（タップで再ログイン）', startUrl);
+      if (j && j.result) {
+        document.documentElement.classList.remove('pg-locked');
+        badge('ログイン中：' + (j.result.name || '') + '（記録しています）');
+      } else {
+        try { localStorage.removeItem('prograv_lt'); } catch(e){}
+        showGate('ログインの有効期限が切れています。再度ログインをお願いします');
+      }
     })
-    .catch(function(){});
+    .catch(function(){ showGate('通信エラーが発生しました。電波の良い場所でもう一度開いてください'); });
 })();
 </script>
 </body>

@@ -805,7 +805,7 @@
     if (c.type === "done"){
       var pgWasRead = isRead(activeItem);
       markRead(activeItem);
-      if (!pgWasRead && window.PGTrack){
+      if (window.PGTrack){
         PGTrack.send({site:"心理学", kind:"読了", itemId: activeItem.no, itemName: activeItem.theme});
         if (quizAnswered) PGTrack.send({site:"心理学", kind:"クイズ", itemId: activeItem.no, itemName: activeItem.theme, score: quizCorrect ? 1 : 0});
       }
@@ -933,6 +933,18 @@
       try { fetch(API + '/api/progress', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t }, body: JSON.stringify(ev) }).catch(function(){}); } catch(e){}
     }
   };
+  var t = pgToken();
+  if (t) {
+    fetch(API + '/api/me', { headers: { 'Authorization': 'Bearer ' + t } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){
+        var badge = document.createElement('div');
+        badge.style.cssText = 'position:fixed;right:10px;bottom:10px;z-index:9999;background:#101c31;color:#fff;font-size:11px;padding:6px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.25);opacity:.92';
+        badge.textContent = (j && j.result) ? ('ログイン中：' + (j.result.name || '') + '（記録しています）') : 'ログインが切れています';
+        document.body.appendChild(badge);
+      })
+      .catch(function(){});
+  }
 })();
 </script>
 </body>

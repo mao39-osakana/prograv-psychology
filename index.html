@@ -61,15 +61,11 @@
   .hub-kicker{font-size:12px;font-weight:900;letter-spacing:.1em;color:var(--orange);margin:4px 2px 8px}
   .hub-title{font-size:30px;font-weight:900;line-height:1.3;margin:0 2px 6px}
   .hub-sub{font-size:13px;color:var(--ink);line-height:1.7;margin:0 2px 18px}
-  .hub-summary{
-    background:var(--card);border:2px solid var(--navy);border-radius:var(--radius);
-    padding:16px 18px;margin-bottom:16px;
-  }
-  @media (prefers-color-scheme: dark){.hub-summary{border-color:#3a4d75}}
-  .hub-summary .s-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
-  .hub-summary .s-label{font-size:13px;font-weight:700;color:var(--sub)}
-  .hub-summary .s-count{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
-  .hub-summary .s-count span{color:var(--sub);font-weight:500;font-size:13px}
+  .map-progress{display:flex;align-items:center;gap:10px;margin:14px 0 16px}
+  .map-progress .bar{flex:1 1 auto;min-width:48px;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+  .map-progress .bar i{display:block;height:100%;width:0;background:linear-gradient(100deg,#f6c945 0%,#f59b2e 60%,#ef7f22 100%);border-radius:99px;transition:width .4s ease}
+  .map-progress .txt{font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .map-progress .txt b{font-size:15px}
   .hub-list{display:flex;flex-direction:column;gap:12px}
   .hub-item{
     display:block;width:100%;text-align:left;background:var(--card);
@@ -294,14 +290,9 @@ try { var __pgLt = new URLSearchParams(location.hash.slice(1)).get('lt'); if (__
     <h1 class="hub-title">小説で読む心理学</h1>
     <p class="hub-sub">画面をフリックして物語を読み進め、解説とクイズを通して心理学を学べます。読みたい作品を選んでください。</p>
 
-    <div class="hub-summary">
-      <div class="s-row">
-        <span class="s-label">進捗</span>
-        <span class="s-count"><span id="hubReadCount">0</span>件読了 <span>／ 全 <span id="hubTotalCount">6</span> 件</span></span>
-      </div>
-      <div class="bar" role="progressbar" aria-label="全体の進捗" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" id="hubBarWrap">
-        <div class="bar-fill" id="hubBarFill"></div>
-      </div>
+    <div class="map-progress" role="progressbar" aria-label="全体の進捗" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" id="hubBarWrap">
+      <div class="bar"><i id="hubBarFill"></i></div>
+      <div class="txt"><b id="hubReadCount">0</b> / <span id="hubTotalCount">6</span> 作品 読了</div>
     </div>
 
     <div class="hub-list" id="hubList"></div>

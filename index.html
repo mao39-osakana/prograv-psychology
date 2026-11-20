@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>心理学教材（小説フック＋フリック）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#101c31;
+    --navy-2:#1b2c4a;
+    --ink:#101c31;
+    --sub:#5b6779;
+    --line:#d7dde8;
+    --bg:#ffffff;
+    --page:#f3f5f8;
+    --card:#ffffff;
+    --tint:#eef1f6;
+    --accent-a:#f6c945;
+    --accent-b:#ef8a1a;
+    --orange:#b96a12;
+    --ok:#1a7a4a;
+    --ok-bg:#eaf6ef;
+    --ng:#b42318;
+    --ng-bg:#fdf0ef;
+    --radius:18px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#eef1f7;
+      --sub:#a9b4c6;
+      --line:#2c3a55;
+      --bg:#0d1524;
+      --page:#0d1524;
+      --card:#141f35;
+      --tint:#1a2947;
+      --orange:#f0a04b;
+      --ok:#5ec98d;
+      --ok-bg:#143527;
+      --ng:#ff9a92;
+      --ng-bg:#3d1f1d;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;touch-action:manipulation}
+  body{
+    font-family:"Noto Sans JP",system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+    background:var(--page);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;min-height:44px;cursor:pointer;touch-action:manipulation}
+  .wrap{max-width:560px;margin:0 auto;padding:18px 16px 28px}
+  [hidden]{display:none !important}
+
+  /* ===== hub ===== */
+  .hub-kicker{font-size:12px;font-weight:900;letter-spacing:.1em;color:var(--orange);margin:4px 2px 8px}
+  .hub-title{font-size:30px;font-weight:900;line-height:1.3;margin:0 2px 6px}
+  .hub-sub{font-size:13px;color:var(--ink);line-height:1.7;margin:0 2px 18px}
+  .hub-summary{
+    background:var(--card);border:2px solid var(--navy);border-radius:var(--radius);
+    padding:16px 18px;margin-bottom:16px;
+  }
+  @media (prefers-color-scheme: dark){.hub-summary{border-color:#3a4d75}}
+  .hub-summary .s-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .hub-summary .s-label{font-size:13px;font-weight:700;color:var(--sub)}
+  .hub-summary .s-count{font-size:15px;font-weight:900;font-variant-numeric:tabular-nums}
+  .hub-summary .s-count span{color:var(--sub);font-weight:500;font-size:13px}
+  .hub-list{display:flex;flex-direction:column;gap:12px}
+  .hub-item{
+    display:block;width:100%;text-align:left;background:var(--card);
+    border:2px solid var(--navy);border-radius:var(--radius);
+    padding:18px 18px 16px;color:var(--ink);
+    box-shadow:0 6px 18px rgba(16,28,49,.07);
+  }
+  @media (prefers-color-scheme: dark){.hub-item{border-color:#3a4d75;box-shadow:none}}
+  .hub-item:active{transform:scale(.995)}
+  .hub-item .i-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .hub-item .i-no{font-size:12px;font-weight:900;letter-spacing:.12em;color:var(--orange)}
+  .hub-item .i-badge{font-size:11px;font-weight:700;border-radius:99px;padding:3px 9px}
+  .hub-item .i-badge.read{color:var(--ok);background:var(--ok-bg)}
+  .hub-item .i-badge.unread{color:var(--sub);background:var(--tint)}
+  .hub-item .i-theme{font-size:22px;font-weight:900;line-height:1.4;margin:0 0 6px}
+  .hub-item .i-story{font-size:14px;font-weight:500;line-height:1.6;color:var(--ink)}
+  .hub-item .i-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:12px;color:var(--sub)}
+  .hub-item .i-open{font-weight:700;color:var(--orange);white-space:nowrap}
+  .hub-note{font-size:12px;color:var(--sub);line-height:1.7;margin:16px 2px 0}
+
+  /* back link */
+  .back-link{
+    display:inline-flex;align-items:center;gap:4px;background:none;border:none;padding:6px 2px;
+    font-size:14px;font-weight:700;color:var(--ink);min-height:36px;margin-bottom:6px;
+  }
+  .back-link:active{opacity:.6}
+
+  /* progress */
+  .progress-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:2px 2px 8px}
+  .progress-head .p-label{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--sub)}
+  .progress-head .p-count{font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .progress-head .p-count span{color:var(--sub);font-weight:500}
+  .bar{height:5px;border-radius:99px;background:var(--line);overflow:hidden}
+  .bar-fill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--accent-a),var(--accent-b));transition:width .35s ease}
+  @media (prefers-reduced-motion: reduce){.bar-fill{transition:none}}
+
+  /* card */
+  .deck{margin-top:14px;position:relative}
+  .card{
+    background:var(--card);
+    border:2px solid var(--navy);
+    border-radius:var(--radius);
+    padding:26px 24px 24px;
+    /* 進捗表示＋カード＋前へ/次へボタンがスクロールなしで画面に収まる高さ。
+       上下の固定要素（戻るリンク・進捗・ナビ等）の合計は約230px＋余裕分 */
+    height:600px;
+    height:min(600px, calc(100vh - 240px));
+    height:min(600px, calc(100dvh - 240px));
+    /* カード内スクロールはしない。本文は表示領域に収まる分量で分割する */
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    box-shadow:0 10px 28px rgba(16,28,49,.10);
+    /* pan-y は manipulation より制限が強い値で、横フリックの判定を
+       ブラウザに奪われないよう従来どおり維持する。
+       ダブルタップズームは auto 以外の値すべてで無効になる */
+    touch-action:pan-y;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  @media (prefers-color-scheme: dark){.card{border-color:#3a4d75;box-shadow:none}}
+  .card.anim-next{animation:slideNext .28s ease}
+  .card.anim-prev{animation:slidePrev .28s ease}
+  @keyframes slideNext{from{opacity:.25;transform:translateX(22px)}to{opacity:1;transform:none}}
+  @keyframes slidePrev{from{opacity:.25;transform:translateX(-22px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){.card.anim-next,.card.anim-prev{animation:none}}
+
+  .kicker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .kicker .tag{font-size:12px;font-weight:900;letter-spacing:.06em;color:var(--orange)}
+  .kicker .sub-tag{font-size:12px;font-weight:500;color:var(--sub)}
+  .kicker .done-badge{font-size:11px;font-weight:700;color:var(--ok);background:var(--ok-bg);border-radius:99px;padding:3px 9px}
+
+  /* title card */
+  .t-no{font-size:13px;font-weight:900;letter-spacing:.14em;color:var(--orange);margin:6px 0 10px}
+  .t-title{font-size:38px;line-height:1.25;font-weight:900;letter-spacing:.01em;margin:0}
+  .t-underline{width:120px;height:5px;border-radius:99px;background:linear-gradient(90deg,var(--accent-a),var(--accent-b));margin:16px 0 22px}
+  .story-box{background:var(--tint);border-radius:12px;padding:16px 18px}
+  .story-box .s-label{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--sub);margin-bottom:6px}
+  .story-box .s-title{font-size:19px;font-weight:700;line-height:1.5}
+  .story-box .s-author{font-size:13px;color:var(--sub);margin-top:6px}
+  .flow{margin:20px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+  .flow li{display:flex;gap:10px;align-items:center;font-size:14px;line-height:1.6}
+  .flow .n{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+  @media (prefers-color-scheme: dark){.flow .n{background:#eef1f7;color:#101c31}}
+  .flow b{font-weight:700}
+  .flow span{color:var(--sub)}
+  .tap-hint{margin-top:auto;padding-top:22px;font-size:12px;color:var(--sub);text-align:center}
+
+  /* story / expl body */
+  .body-text{font-size:17px;line-height:2.05;font-weight:400;letter-spacing:.01em;word-break:break-word}
+  .body-text.small{font-size:16px;line-height:1.95}
+  .body-text p{margin:0 0 .9em}
+  .body-text p:last-child{margin-bottom:0}
+  .card-foot{margin-top:auto;padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--sub)}
+  .card-foot .dots{margin-left:auto}
+  .dots{display:flex;gap:5px}
+  .dots i{width:6px;height:6px;border-radius:50%;background:var(--line);display:block}
+  .dots i.on{background:var(--accent-b)}
+
+  .expl-head{font-size:22px;font-weight:900;line-height:1.5;margin:0 0 14px}
+  .expl-head em{font-style:normal;background:linear-gradient(transparent 62%, rgba(246,201,69,.55) 62%)}
+  @media (prefers-color-scheme: dark){.expl-head em{background:linear-gradient(transparent 62%, rgba(239,138,26,.45) 62%)}}
+
+  /* quiz */
+  .q-text{font-size:18px;font-weight:700;line-height:1.65;margin:0 0 14px}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+    background:var(--card);border:2px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:14.5px;line-height:1.6;color:var(--ink);font-weight:500;
+    min-height:56px;
+  }
+  .opt .num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:2px solid var(--navy);color:var(--navy);font-weight:900;font-size:14px;display:inline-flex;align-items:center;justify-content:center;margin-top:1px}
+  @media (prefers-color-scheme: dark){.opt .num{border-color:#8fa3c8;color:#dbe4f5}}
+  .opt:active{transform:scale(.99)}
+  .opt.correct{border-color:var(--ok);background:var(--ok-bg)}
+  .opt.correct .num{border-color:var(--ok);background:var(--ok);color:#fff}
+  .opt.wrong{border-color:var(--ng);background:var(--ng-bg)}
+  .opt.wrong .num{border-color:var(--ng);background:var(--ng);color:#fff}
+  .opt.dim{opacity:.55}
+  .opt:disabled{cursor:default}
+  .quiz-result{margin-top:12px;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.75;display:none}
+  .quiz-result.show{display:block}
+  .quiz-result.ok{background:var(--ok-bg);border:1.5px solid var(--ok)}
+  .quiz-result.ng{background:var(--ng-bg);border:1.5px solid var(--ng)}
+  .quiz-result .r-head{font-weight:900;margin-bottom:4px}
+  .quiz-result.ok .r-head{color:var(--ok)}
+  .quiz-result.ng .r-head{color:var(--ng)}
+
+  /* done card */
+  .done-wrap{text-align:center;margin:auto 0}
+  .done-check{width:64px;height:64px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,var(--accent-a),var(--accent-b));display:flex;align-items:center;justify-content:center}
+  .done-check svg{width:32px;height:32px}
+  .done-title{font-size:24px;font-weight:900;line-height:1.5;margin:0 0 8px}
+  .done-sub{font-size:14px;color:var(--sub);line-height:1.8;margin:0}
+
+  /* nav */
+  .nav{display:flex;gap:10px;margin-top:14px}
+  .btn{
+    border-radius:12px;font-size:15px;font-weight:700;padding:12px 18px;
+    border:2px solid var(--navy);background:var(--card);color:var(--ink);
+    min-height:52px;
+  }
+  @media (prefers-color-scheme: dark){.btn{border-color:#3a4d75}}
+  .btn-prev{flex:0 0 108px}
+  .btn-next{flex:1;background:var(--navy);color:#fff;border-color:var(--navy)}
+  @media (prefers-color-scheme: dark){.btn-next{background:#eef1f7;color:#101c31;border-color:#eef1f7}}
+  .btn:disabled{opacity:.35;cursor:default}
+  .btn-restart{width:100%;background:var(--navy);color:#fff;border-color:var(--navy);margin-top:22px}
+  @media (prefers-color-scheme: dark){.btn-restart{background:#eef1f7;color:#101c31;border-color:#eef1f7}}
+  .btn-tolist{width:100%;margin-top:10px}
+  .nav-hint{text-align:center;font-size:12px;color:var(--sub);margin-top:10px}
+  @media (max-width:420px){
+    .card{padding:22px 19px 20px}
+    .t-title{font-size:33px}
+    .body-text{font-size:16.5px}
+    .hub-title{font-size:27px}
+  }
+  /* クイズ回答後は選択肢と結果表示を少し詰め、フッターの案内文を畳んで
+     結果まで含めてカード内に収める */
+  .card.quiz-answered .options{gap:8px}
+  .card.quiz-answered .opt{padding:10px 12px}
+  .card.quiz-answered .quiz-result{margin-top:10px;padding:10px 12px;font-size:13px;line-height:1.7}
+  .card.quiz-answered .card-foot{display:none}
+  @media (max-height:880px){
+    .card.quiz-answered .kicker{margin-bottom:10px}
+    .card.quiz-answered .q-text{margin-bottom:8px}
+    .card.quiz-answered .opt{line-height:1.5}
+    .card.quiz-answered .quiz-result{line-height:1.6}
+  }
+
+  /* 背の低い画面では外側の余白を詰めてカードを少し高くし、
+     タイトルカードの中身も詰めて、スクロールなしで収める */
+  @media (max-height:760px){
+    .wrap{padding-top:10px;padding-bottom:14px}
+    .back-link{min-height:32px;margin-bottom:0}
+    .progress-head{margin-bottom:6px}
+    .deck{margin-top:10px}
+    .nav{margin-top:10px}
+    .nav-hint{display:none}
+    .card{height:calc(100vh - 166px);height:calc(100dvh - 166px);padding-top:18px;padding-bottom:14px}
+    .kicker{margin-bottom:10px}
+    .t-no{margin:2px 0 6px}
+    .t-underline{margin:12px 0 16px}
+    .story-box{padding:13px 16px}
+    .flow{margin-top:14px;gap:6px}
+    .tap-hint{padding-top:14px}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- ===== hub view ===== -->
+  <section id="hubView">
+    <p class="hub-kicker">心理学インプット教材</p>
+    <h1 class="hub-title">小説で読む心理学</h1>
+    <p class="hub-sub">画面をフリックして物語を読み進め、解説とクイズを通して心理学を学べます。読みたい作品を選んでください。</p>
+
+    <div class="hub-summary">
+      <div class="s-row">
+        <span class="s-label">進捗</span>
+        <span class="s-count"><span id="hubReadCount">0</span>件読了 <span>／ 全 <span id="hubTotalCount">6</span> 件</span></span>
+      </div>
+      <div class="bar" role="progressbar" aria-label="全体の進捗" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" id="hubBarWrap">
+        <div class="bar-fill" id="hubBarFill"></div>
+      </div>
+    </div>
+
+    <div class="hub-list" id="hubList"></div>
+    <p class="hub-note">読了の状態は、この端末に保存されます。</p>
+  </section>
+
+  <!-- ===== deck view ===== -->
+  <section id="deckView" hidden>
+    <button class="back-link" id="backBtn" type="button">‹ 一覧に戻る</button>
+    <div class="progress-head" aria-live="polite">
+      <div class="p-label" id="phaseLabel">タイトル</div>
+      <div class="p-count"><span id="curNum">1</span> / <span id="totalNum">12</span> <span>枚</span></div>
+    </div>
+    <div class="bar" role="progressbar" aria-label="進捗" aria-valuemin="1" aria-valuemax="12" aria-valuenow="1" id="barWrap">
+      <div class="bar-fill" id="barFill"></div>
+    </div>
+
+    <div class="deck">
+      <article class="card" id="card" aria-live="polite"></article>
+    </div>
+
+    <div class="nav" id="navRow">
+      <button class="btn btn-prev" id="prevBtn" type="button">← 前へ</button>
+      <button class="btn btn-next" id="nextBtn" type="button">次へ →</button>
+    </div>
+    <p class="nav-hint">カードをタップ、または左右にスワイプでもめくれます</p>
+  </section>
+</main>
+
+<script>
+(function(){
+
+  var ITEMS = [
+    {
+      id: "no1",
+      no: "No.1",
+      theme: "ハロー効果",
+      storyTitle: "『地図の読めない彼女』",
+      readKey: "prograv_psy_no1_read",
+      readAtKey: "prograv_psy_no1_read_at",
+      expl2Head: "使い方 ― 本人に聞いてみる",
+      story: [
+        "会議で話が止まると、美咲が資料を一枚戻した。\n\n「今決めるのは、こちらで進めるかどうかですよね。細かい修正は、決まってからでも間に合います」\n\n亮介が十分かけてもまとめられなかった話が、それで先へ進んだ。\n\n美咲と二人で食事をするようになってからも、亮介はどこかで仕事中の彼女を見ていた。店を予約するときには、駅からの距離だけでなく、席の広さや照明の写真まで調べた。自分が普段通っている定食屋は、一度も候補に入れなかった。\n\n彼女なら、もっといい店を知っているだろう。",
+        "日曜日、初めて昼に待ち合わせた。美咲は改札を出ると、予約した店の場所をスマートフォンで確かめた。\n\n「こっちかな」\n\n亮介も地図を保存していたが、開かずに隣を歩いた。\n\n五分ほどすると、店の多い通りが終わり、住宅街に入った。予約の案内には、駅から徒歩三分と書かれていたはずだった。\n\n「この辺？」\n\n美咲が足を止めた。画面を見て、今来た道を振り返る。\n\n「ごめん。駅の反対側だった」",
+        "亮介は、美咲の手元をのぞき込んだ。駅を挟んで、現在地と店の印が離れていた。\n\n「意外だな」\n\n「何が？」\n\n「道、間違えるんだと思って」\n\n美咲は顔を上げた。\n\n「間違えるよ。初めての駅は、だいたいわからない」\n\n「会社では、何でもすぐ決めるから」\n\n言ってから、亮介は自分のスマートフォンを取り出した。\n\n「俺も地図、持ってたのに。見てなかった」\n\n「じゃあ、今度はそっちで見て」\n\n駅まで戻り、反対側の出口へ抜けた。店はすぐに見つかった。",
+        "席に着くと、店員がコートを預かりに来た。美咲が脱ぐのを見て、亮介も上着を脱いだ。テーブルには、布のナプキンと大小のナイフが並んでいた。\n\n「いつも、ちゃんと調べてくれるね」\n\n美咲が店内を見回した。\n\n「こういうところ、よく行くのかと思って」\n\n「私？」\n\n「うん」\n\n「友達の誕生日くらいかな。普段は、会社の近くで済ませちゃう」\n\n亮介は、昨夜まで見比べていた店の写真を思い出した。美咲がどんな店を好きなのか、一度も聞いていなかった。",
+        "「会社の裏の定食屋は？」\n\n「行ったことない。おいしい？」\n\n「生姜焼きが。週に一回は行く」\n\n「へえ。今度そこにしようよ」\n\n「狭いよ。カウンターしかない」\n\n「そうなんだ。じゃあ、長く話す日は別のところかな」\n\n美咲はそう言って、目の前のメニューを開いた。亮介も、自分の食べたい料理を探した。\n\n食事のあと、美咲は駅前のスーパーに寄りたいと言った。\n\n「夜の分、買って帰ろうと思って」\n\n「作るんだ」\n\n「ううん。お弁当。今日はもう、家で何もしたくない」",
+        "亮介は店を出たところで道を確かめた。今度は美咲にも画面を見せ、二人で駅の方角を確かめた。\n\n月曜日、美咲はいつもどおり会議を進めていた。亮介の説明が曖昧になると、「それは、いつまでにわかりますか」と尋ねた。亮介は慌てて手帳を開いた。\n\n昼休み、廊下で会った美咲が足を止めた。\n\n「今日、お弁当？」\n\n「いや、食べに出る」\n\n「あの定食屋、連れてって」",
+        "店へ入ると、亮介はカウンターの奥へ進んだ。美咲が隣に座り、壁の短冊を見上げた。\n\n「生姜焼き？」\n\n「うん。ご飯、多めで」\n\n「私は普通で」\n\n注文を取りに来た店主に、亮介はいつもの声で頼んだ。\n\n「生姜焼き二つ。こっちだけ、ご飯多めでお願いします」"
+      ],
+      expl: [
+        "「仕事ができる人だから、暮らしもきちんとしていそう」「服の趣味がいいから、おいしい店にも詳しそう」。一つの目立つ長所に引かれて、まだよく知らない面まで高く評価することがあります。これが「ハロー効果」です。\n\n亮介が見ていたのは、美咲の仕事ぶりでした。ところが、その印象から、道案内も得意で、休日も洒落た店に通っているように思っていました。道に迷ったことよりも、それを「意外だ」と感じたところに、彼の思い込みが表れています。",
+        "憧れている相手には、好みを聞く前から、似合いそうなものを選んでしまうことがあります。店も、贈り物も、休日の過ごし方も。「あの人ならこうだろう」と考えたときは、本人から聞いたことだったか、振り返ってみてください。\n\n「いつも、どんな店で食べてる？」「休みの日は出かけたいほう？」。すでに知っているつもりの相手にも、まだ聞いていないことはあります。好きになった長所はそのままに、知らないところは本人に尋ねてみる。その返事が予想と違っても、長所までなくなったわけではありません。"
+      ],
+      quiz: {
+        q: "「仕事ができる人だから、休日もおしゃれな店に詳しいはず」と感じたとき、確かめる方法は？",
+        options: ["印象に合いそうな店を、自分で選んで予約する","本人に「普段どんな店で食べてる？」と聞いてみる","SNSの投稿から好みを推測する"],
+        correct: 1,
+        resultText: "一つの長所から、知らない面まで高く見積もってしまうのがハロー効果です。知らないところは、推測で埋めずに本人へ聞くのが確実です。"
+      }
+    },
+    {
+      id: "no2",
+      no: "No.2",
+      theme: "単純接触効果",
+      storyTitle: "『火曜日の、いつもの席』",
+      readKey: "prograv_psy_no2_read",
+      readAtKey: "prograv_psy_no2_read_at",
+      expl2Head: "使い方 ― 次に会ったときに",
+      story: [
+        "火曜日だけ、紗季はコーヒーを店内で飲む。\n\n駅前の喫茶店から歩いて五分のところに、通い始めた英会話教室があった。仕事帰りに直接向かうと、授業まで三十分ほど余る。その時間を、本を読んで過ごすことにしていた。\n\n窓際には、いつも同じ人が座っていた。紗季より少し年上に見える男性で、紺色の鞄を足元に置き、何かの資料を読んでいる。最初は、それだけだった。気になる人でも、話しかけたい人でもなかった。",
+        "三度目か四度目に目が合ったとき、彼が軽く会釈した。紗季も、カップを持ったまま頭を下げた。\n\n翌週は「こんばんは」と言った。\n\nその次の週には、店の入口に貼られた営業時間変更のお知らせについて、少し話した。\n\n「火曜日、閉店が早くなるんですね」「僕らには、あまり関係なさそうですけど」\n\n僕ら、という言い方が、紗季には少しくすぐったかった。",
+        "それからも会話は長くならなかった。急に寒くなったこと。新しいケーキが甘すぎたこと。店主が窓辺の鉢植えを増やして、座る場所が狭くなったこと。\n\n名前も仕事も知らないのに、店のドアを開けて彼の姿を見つけると、紗季は少しほっとするようになっていた。",
+        "ある火曜日、窓際の席が空いていた。\n\n紗季はいつもの席に座り、本を開いた。ドアベルが鳴るたびに顔を上げたが、入ってくるのは別の客だった。\n\n授業の時間になっても、しおりは最初に開いたページに挟まったままだった。",
+        "翌週、彼はまた窓際にいた。\n\n「こんばんは」\n\n自分の声がいつもより明るくて、紗季は少し恥ずかしくなった。\n\n「こんばんは。先週、出張だったんです」「そうだったんですね」\n\n何も聞いていないのに教えてくれたことが、うれしかった。\n\n鞄から本を取り出しかけて、紗季は手を止めた。\n\n「先週、なんだか静かでした」「ここ、いつも静かじゃないですか」「そうなんですけど」\n\n彼が笑った。紗季も笑った。もう少しうまく言えたらよかったのに、と思ったが、それ以上は言い直さなかった。",
+        "帰る時間になり、紗季がコートを手に取ると、彼が資料から顔を上げた。\n\n「来週も、この時間ですか」「教室が休みなんです」\n\n彼は「ああ」と言い、カップに視線を落とした。\n\n紗季は袖に腕を通しながら、続けた。\n\n「でも、コーヒーは飲みに来ようかなって」「それなら、よかった」\n\nそれだけの返事だった。けれど、紗季は手袋をはめるのに少し手間取った。",
+        "店を出る前に、振り返った。\n\n「あの。私、紗季といいます」\n\n彼も名前を教えてくれた。\n\n来週は、少し早く来ようと思った。"
+      ],
+      expl: [
+        "何度も顔を合わせるうちに、相手に親しみや好感を持ちやすくなる傾向を「単純接触効果」という。紗季にとっても彼は、毎週見かけるうちに、姿を見つけるとほっとする人になっていた。\n\n親しくなるきっかけは、会話が盛り上がることだけではない。",
+        "何を話そうか迷ったら、前に聞いた話を思い出してみる。「この前、観たいと言っていた映画、どうでした？」面白い話を用意するより、その人について気になっていることを聞くほうが言葉も出てきやすい。\n\nただし顔見知りになったからといって恋愛感情が生まれるとは限らない。相手が急いでいれば長く引き留めず「また今度、聞かせてください」と別れる。自然に会う機会を大事にしながら、相手も会話を楽しんでいるかを見ていく。"
+      ],
+      quiz: {
+        q: "単純接触効果が働きやすいのは、どんな会い方？",
+        options: ["長い時間を、1回だけ一緒に過ごす","短い接触を、何度も重ねる","毎日、長文の連絡を送り続ける"],
+        correct: 1,
+        resultText: "好感は「1回の濃さ」より「顔を合わせた回数」で育ちやすい。短くても自然に会う機会が重なるほうが、相手にとって「見慣れた、安心できる人」になっていく。"
+      }
+    },
+    {
+      id: "no5",
+      no: "No.5",
+      theme: "自己開示の返報性",
+      storyTitle: "『待ち合わせの三十分前』",
+      readKey: "prograv_psy_no5_read",
+      readAtKey: "prograv_psy_no5_read_at",
+      expl2Head: "使い方 ― 自分の話を少し添える",
+      story: [
+        "直人が店に着いたのは、約束の三十分前だった。\n\n入口のメニューを読んでから、駅まで引き返した。改札前の時計を見ても、五分しかたっていなかった。店へ戻る途中の公園で、ベンチに座った。\n\n千尋とは先月、友人の飲み会で知り合った。帰りの電車が同じだったので、駅まで一緒に歩いた。その日はもう少し話したいと思って別れたのに、いざ二人で会うとなると、何を話したかったのか思い出せない。",
+        "五分前に店へ戻った。ほどなくして千尋が来た。\n\n「待ちました？」\n\n「いえ、大丈夫です」\n\n席に着くと、直人は、千尋が前に話していた仕事のことを尋ねた。広告の仕事をしていることは覚えていたが、詳しいことはわからなかった。\n\n「毎日、忙しいんですか」\n\n「時期によりますね。今週はわりと早く帰れました」\n\n「そうなんですね」\n\nそこで、直人は次の質問を探した。",
+        "千尋がメニューをめくったので、自分も開いた。もう入口で読んで決めていたが、もう一度、魚料理と肉料理を見比べた。\n\n注文を終えると、千尋が窓の外へ目を向けた。\n\n「この辺、よく来るんですか」\n\n「初めてです」\n\n「迷わなかったですか。私、さっき向こうの通りに入っちゃって」\n\n直人は、窓から見える公園を指した。\n\n「僕は早く着きすぎて、あそこで待ってました」\n\n「公園で？」\n\n「三十分前に着いてしまって」",
+        "千尋が時計を見た。\n\n「寒くなかったですか」\n\n「寒かったです。店に入ればよかったんですけど、予約の時間まで待たないといけない気がして」\n\n店内では、先ほどから一人の客がコーヒーを飲んでいる。ああすればよかったのだと、今さら思った。\n\n「何を話そうか考えてたんですが、今、全然出てこないです」\n\n言ったあとで、直人は水を飲んだ。",
+        "「仕事のこと聞いてても、次は何を聞こう、って。そればっかり考えてました」\n\n「ああ。それで、さっきメニューを裏まで見てたんですね」\n\n「裏、何も書いてなかったです」\n\n千尋が口元を押さえた。直人も、膝に置いたメニューを店員に返した。\n\n料理が運ばれてきて、しばらく二人で食べた。千尋は魚をひと口食べてから、直人に尋ねた。",
+        "「あの飲み会、直人さんはよく行くんですか」\n\n「たまに。友達に誘われたときだけです」\n\n「私、あの日、途中で一回外に出たんです。電話するって言って」\n\n「そうでしたっけ」\n\n「本当は電話じゃなくて。人が多いところ、だんだん疲れてきちゃうんです」\n\n直人は箸を置いた。\n\n千尋は、飲み会ではよく笑っていた。誰に話を振られても答えていたし、初めて会う人にも自分から声をかけていた。\n\n「そうは見えなかったです」\n\n「だいたいそう言われます。帰るころには、もう何もしゃべりたくなくなってるんですけど」\n\n「帰り、僕、ずっと話しかけてましたね」\n\n「あれくらいなら平気です。大声を出さなくていいので」",
+        "千尋は窓のほうを見た。\n\n「今日は、静かな店でよかった」\n\n直人も魚をひと口食べた。予約する前、写真を何枚も見比べていたことは、今は言わずにおいた。\n\n「休みの日も、静かなところに行くんですか」\n\n「家にいることが多いです。映画とか。直人さんは？」\n\n「昨日は、昔買った漫画を読み返してました。洗濯が終わるまでのつもりだったんですけど、夕方まで読んでしまって」",
+        "題名を伝えると、千尋は知らないと言った。\n\n「どんな話なんですか」\n\n直人が説明を始めると、千尋は途中で何度か尋ねた。主人公には兄がいるのか。その兄はなぜ家を出たのか。\n\n「その先、結末にかかわるんですけど、言っていいですか」\n\n「いいです。私、先に結末を知りたいほうなので」\n\n「え、そうなんですか」\n\n「安心して見られるじゃないですか」\n\n「僕は知らないほうがいいです」\n\n「じゃあ、直人さんには言わないようにします」\n\n千尋は食べ終えた皿を脇に寄せた。\n\n「それで、お兄さんは帰ってくるんですか」"
+      ],
+      expl: [
+        "自分の経験や気持ちを話すと、相手も自分のことを話しやすくなる。こうした傾向を「自己開示の返報性」といいます。直人が待ち合わせ前の緊張を話したあと、千尋も、大人数の集まりでは疲れてしまうことを話しています。",
+        "好きな人を前にすると、聞くことばかり考えて、自分の話は無難に済ませたくなるものです。「休みは映画を観たりしています」と答えれば、変には思われない。でも、それだけでは、相手も何を聞いたらいいか迷います。\n\n「昨日は漫画を読み返していたら、夕方になってしまって」。普段なら省いてしまう、そんな話を添えてみてください。何に夢中になるのか、どんな休日を過ごすのか。相手があなたについて知れることが増えます。秘密や深刻な悩みでなくても、自分のことは話せます。\n\n相手がすぐに同じような話を返してくれるとは限りません。「あなたは？」と続けて尋ねるより、自分の話への感想を聞いたり、相手が話し始めたことに耳を傾けたりする。用意してきた話題を全部使うより、今、二人で話していることを続けてみましょう。"
+      ],
+      quiz: {
+        q: "自分のことを相手に話してもらうきっかけとして、自然なのは？",
+        options: ["自分のことは伏せて、相手への質問を続ける","自分の普段の様子や気持ちを少し話してから、相手の話を聞く","秘密や深刻な悩みを打ち明けて、相手にも話してもらう"],
+        correct: 1,
+        resultText: "直人が待ち合わせ前の緊張を話したあと、千尋も自分のことを話し始めました。重い打ち明けでなく、普段なら省いてしまうくらいの話で十分です。"
+      }
+    },
+    {
+      id: "no18",
+      no: "No.18",
+      theme: "確証バイアス",
+      storyTitle: "『既読の向こうに、私が作ったあなた』",
+      readKey: "prograv_psy_no18_read",
+      readAtKey: "prograv_psy_no18_read_at",
+      expl2Head: "使い方 ― 返信が気になったら",
+      story: [
+        "「了解」\n\n莉子から届いた二文字を、僕はもう三回読み返していた。\n\n付き合い始めたころは、もっと長い返事が来た。絵文字もあったし、何でもない写真が送られてくることもあった。最近は、僕が送った質問に答えるだけで、会話が終わることが多い。\n\n先週は土曜日の誘いを断られた。その前に会った日も、莉子は夕食の途中で何度かスマートフォンを見ていた。\n\nもう、前ほど好きではないのだろう。\n\nそう考えると、いろいろなことの説明がついた。",
+        "僕は友人に相談しようと、莉子の短い返事を何枚かスクリーンショットに残した。並べてみると、思った以上によそよそしかった。\n\nそのとき、莉子から新しいメッセージが届いた。\n\n「水曜、何時なら会えそう？」\n\n僕は画面を見たまま、しばらく動かなかった。",
+        "土曜日を断った埋め合わせだろうか。悪いと思って、誘っているだけかもしれない。\n\nそこまで考えてから、自分がどんな返事を待っているのか、わからなくなった。\n\n短ければ、冷めた証拠。誘われても、気を使っているだけ。\n\nでは、莉子が何と言えば、会いたいのだと受け取れるのだろう。",
+        "僕は、さっき撮った画面ではなく、二人のやり取りを開き直した。\n\n「ごめん、土曜は難しい」\n\nそのすぐ下には、もう一つ、莉子のメッセージがあった。\n\n「来週の水曜か日曜なら空いてる。航は？」\n\n読んだ覚えはあった。でも、友人に見せようとした画像には入っていなかった。",
+        "さらにさかのぼると、僕の仕事の発表について「どうだった？」と尋ねる言葉があった。夕食の途中で見ていたスマートフォンには、母親から連絡が来ていた。その場で説明されて、僕も「返してあげなよ」と言ったのだった。",
+        "だからといって、何も心配しなくていいと決まったわけではない。\n\n会話が減って寂しいことも、会えない週末が続いたことも、本当だった。\n\n僕は画像を閉じた。\n\n「水曜は七時に出られる。それと、最近ちょっと寂しかった。会ったとき話してもいい？」\n\n送信してから、スマートフォンを伏せた。すぐに裏返したくなったが、台所に行って、使ったままのコップを洗った。",
+        "しばらくして電話が鳴った。\n\n「今、少し話せる？」\n\n莉子の声は、僕が画面を見ながら想像していた声より、ずっと柔らかかった。\n\n「今月、余裕がなくて。返事、そっけなくなってたと思う」「もう会いたくないのかと思った」「会いたいよ。でも、前みたいに毎週末は、今は難しい」",
+        "僕は窓際に移動した。\n\n聞きたいことは、まだあった。自分がどのくらい会いたいのかも、ちゃんと言葉にしてみる必要があった。\n\n翌朝、莉子から店の候補が送られてきた。\n\n僕は返信の時刻ではなく、まず、店の地図を開いた。"
+      ],
+      expl: [
+        "返信は来ている。でも、前より短い。絵文字もなくなった。気になってやり取りをさかのぼると、そっけない返事ばかりが目につき、「やっぱり気持ちが冷めたんだ」と思えてくる。\n\n自分の考えに合う情報に注目し、合わない情報を見落としやすくなる傾向を「確証バイアス」といいます。彼は、誘いを断られたことを気にする一方で、莉子が別の日を提案してくれていたことを、ほとんど考慮していませんでした。",
+        "同じように返信が気になったときは、その一通だけでなく、前後のやり取りも読み直してみてください。相手から誘ってくれた日はなかったか。忙しい時期だと話していなかったか。「冷めた」とは言い切れない出来事も、一緒に思い出してみるのです。\n\nそれでも以前と違うところが気になるなら、本人に聞いてみましょう。「最近、返事が短いから少し気になってる。忙しい？」「会えない日が続いて寂しかった。今週、少し話せる？」でもいい。自分が寂しいことは伝えつつ、相手の気持ちは、返ってくる言葉を聞いてから考えましょう。"
+      ],
+      quiz: {
+        q: "確証バイアスに気づくために効くのは、どれ？",
+        options: ["そっけない返信だけを集めて見返す","やり取り全体を読み直して、考えに合わない出来事も探す","返信の長さで相手の気持ちを判断する"],
+        correct: 1,
+        resultText: "自分の考えに合う情報ばかり集めると、判断は固まっていく。全体を読み直すと、別の日を提案してくれていたような、考えに合わない出来事も見えてくる。"
+      }
+    },
+    {
+      id: "no19",
+      no: "No.19",
+      theme: "アサーション",
+      storyTitle: "『「大丈夫」をやめた夜』",
+      readKey: "prograv_psy_no19_read",
+      readAtKey: "prograv_psy_no19_read_at",
+      expl2Head: "使い方 ― 「大丈夫」と言いそうになったら",
+      story: [
+        "土曜日の夜、結衣は目覚ましを七時に合わせた。\n\n明日は遼と出かける。十時に駅で待ち合わせて、海の近くまで電車に乗る予定だった。\n\n楽しみにしていた。月曜日までは。\n\n今週は仕事が立て込み、帰宅すると服を着替える前にソファに座り込む日が続いた。今日も、洗濯機が止まった音を聞いてから、もう二十分が過ぎている。",
+        "スマートフォンが震えた。\n\n「明日、晴れるって。楽しみ」\n\n結衣は「私も」と打った。送信する前に、電話がかかってきた。\n\n「何してた？」「洗濯」「声、眠そう。大丈夫？」\n\n「大丈夫だよ」\n\nいつもの返事が、考えるより先に出た。",
+        "遼が楽しそうに明日の店の話を始める。結衣は相づちを打ちながら、洗濯かごの底に落ちている片方だけの靴下を見ていた。\n\n明日も、笑っていれば何とかなるだろう。電車で眠ればいい。せっかく調べてくれたのだから。\n\nそこまで考えて、先月のデートを思い出した。疲れを隠して歩き続け、夕方にはほとんど話せなくなった。遼に「楽しくなかった？」と聞かれ、そんなことないと答えた。\n\nあの日は、帰ってから泣いた。遼はそのことを知らない。",
+        "「ごめん。ちょっと待って」\n\n電話の向こうが静かになった。\n\n「さっき大丈夫って言ったけど、本当は、かなり疲れてる」「明日、無理そう？」「朝から出かけるのは、ちょっと。でも、会いたくないわけじゃなくて」\n\n結衣は、最後の言葉だけ早口になった。\n\n遼はすぐには返事をしなかった。結衣は「やっぱり行ける」と言いそうになり、口を閉じた。",
+        "「海のほう、朝のうちに着きたかったんだよね。午後からだと、あまりゆっくりできないかも」「うん。それはそうだね」\n\n楽しみにしていたのは、遼も同じだ。残念に思うことまで、やめてもらうわけにはいかない。\n\n「海は別の日にして、明日は午後から家で会うのはどう？　午前中、少し休みたい」\n\n遼が息を吐いた。\n\n「そっか。わかった。じゃあ、三時くらい？」「三時なら、うれしい」「夕飯、何か買っていく？」「一緒に買いに行きたい。近所でいいから」",
+        "電話を切ってからも、結衣は少し落ち着かなかった。がっかりさせたのではないかと、何度も考えた。\n\nそれでも、目覚ましを解除した。\n\n翌朝は、目が覚めてもすぐには起きなかった。しばらく布団の中で過ごしてから、遅い朝食を取った。午後になって洗濯物を畳み、散らかっていたテーブルを拭いた。",
+        "三時になり、インターホンが鳴った。\n\nドアを開けると、遼が紙袋を持って立っていた。\n\n「駅のパン屋、寄ってきた」「ありがとう。お茶、いれるね」\n\n遼が靴を脱いでいる間、結衣はその背中に声をかけた。\n\n「今日は、来てくれてうれしい」\n\n言ってから、自分でも驚いた。\n\nいつもの「大丈夫」より、ずっと簡単に口から出た。"
+      ],
+      expl: [
+        "「今日は休みたい」と言っただけなのに、「会いたくない」と受け取られたらどうしよう。相手が楽しみにしているとわかっているほど、予定を変えてほしいとは言いにくくなります。\n\n結衣が伝えたのは、「会いたいけれど、午前中は休みたい」という希望でした。遼も朝から海へ出かけたかったと話し、二人で別の予定を相談しています。こうして、自分の気持ちや希望を率直に伝えながら、相手の気持ちも尊重する自己表現の方法を「アサーション」といいます。",
+        "「大丈夫」と答えそうになったら、会いたいかどうかだけでなく、何時からなら会えそうか、どんな過ごし方なら無理がないかまで考えてみてください。「明日は会いたいけど、今週は疲れているから、午後からにしない？」。休みたい理由と希望する時間を伝えれば、相手も予定を考え直せます。\n\nもちろん、そう言えば相手がすぐに納得するとは限りません。残念そうな顔を見て、「やっぱり行ける」と言い直したくなることもあるでしょう。ただ、そこで予定を元に戻すと、疲れていることを伝えたのに、結局は無理をすることになります。\n\n「海に行くのは別の日にしよう。明日は午後から、家でゆっくり会うのはどう？」相手の希望を聞いたあとも、自分の希望を取り下げずに相談は続けられます。"
+      ],
+      quiz: {
+        q: "アサーションに近い伝え方は、どれ？",
+        options: ["疲れていても「大丈夫」と言って、予定どおり行く","会いたい気持ちと休みたい希望の両方を伝えて、別の形を相談する","疲れたので、理由を言わずに当日キャンセルする"],
+        correct: 1,
+        resultText: "アサーションは、自分の希望を引っ込めるのでも、相手の希望を押し切るのでもない。「会いたいけど、午前中は休みたい」と両方を言葉にして、別の形を一緒に探す伝え方です。"
+      }
+    },
+    {
+      id: "no20",
+      no: "No.20",
+      theme: "ヤマアラシ・ジレンマ",
+      storyTitle: "『同じ部屋で、別々に』",
+      readKey: "prograv_psy_no20_read",
+      readAtKey: "prograv_psy_no20_read_at",
+      expl2Head: "使い方 ― 距離をその都度確かめる",
+      story: [
+        "奈緒と暮らし始めて二か月、佑介は同じ本を読み続けていた。\n\n食卓に置いておくと、奈緒が仕事から帰ってきたときに片づける。夕食のあとに開こうとすると、「何か観る？」と聞かれる。断るほどの理由でもない気がして、二人でテレビをつけた。\n\n一人暮らしのころは、平日の夜に会えたら、それだけでうれしかった。\n\n今も奈緒が帰ってくるのはうれしい。ただ、食卓に置く本のページは、何日も同じところだった。",
+        "日曜日の朝、佑介が読書をしていると、奈緒がスマートフォンを持ってきた。\n\n「このパン屋、川の近くだって。歩いて行けそう」\n\n佑介は画面を見て、「うん」と答えた。\n\n奈緒は、近くに雑貨屋もあるらしいと話した。その店の写真を見せられたとき、佑介は同じ行を三度読んだところだった。\n\n「どこでもいいよ」\n\n奈緒がスマートフォンを下ろした。\n\n「行きたくない？」\n\n「そうじゃないけど」\n\n「じゃあ、何？」\n\n「今、ここ読んでたから」",
+        "奈緒はしばらく立っていたが、洗面所へ行った。戻ってくると、部屋着から着替えていた。\n\n「一人で行ってくる。お昼、適当に食べてて」\n\n佑介は玄関までついていった。「俺も行く」と言いかけたが、奈緒が靴ひもを結ぶ間に、言うのをやめた。\n\nドアが閉まってから、食卓へ戻った。\n\n久しぶりに、話の続きが気になってページをめくった。昼過ぎにパンを焼き、食べ終わると、また読んだ。\n\n二時になるころ、玄関の物音が気になり始めた。",
+        "さっきの返事は、嫌だっただろう。何時に帰るのか聞こうとスマートフォンを持ったところで、奈緒から写真が届いた。\n\nパン屋のトレーに、丸いパンが三つ載っていた。\n\n「くるみの、いる？」\n\n「いる。ありがとう」と返した。\n\n奈緒が帰ってきたのは三時過ぎだった。紙袋を食卓に置き、靴下を脱いだ。\n\n「思ったより遠かった。帰りはバスにしちゃった」\n\n佑介はやかんに水を入れた。",
+        "「朝、ごめん。あの言い方はよくなかった」\n\n「うん。嫌だった」\n\n蛇口を閉めると、部屋が静かになった。\n\n「本、読みたかったんだ」\n\n「そう言ってくれたらよかったのに。私、今日一緒に出かけるつもりだったから」\n\n佑介はやかんを火にかけた。奈緒は紙袋からパンを出し、店でもらった地図を畳んだ。\n\n「今度は一緒に行こう」\n\n「今度はね。今日はもう歩きたくない」\n\nお茶をいれて、二人でパンを食べた。奈緒は、雑貨屋で見つけた皿の写真を見せた。佑介が「買わなかったの？」と尋ねると、「重かったから」と答えた。",
+        "その夜、本を開くか迷っていると、奈緒がテレビをつけた。佑介は本を寝室へ持っていった。しばらく読んだが、向こうから笑い声が聞こえるたびに、何を観ているのか気になった。\n\n結局、本を持って戻った。\n\n「こっちで読むの？」\n\n「うん」\n\n奈緒はソファの端へ寄った。佑介は空いたところに座ったが、テレビの音が気になって、なかなか先へ進めなかった。\n\nその日は、二十ページほど読んで本を閉じた。",
+        "翌週の日曜日、午前中は佑介が家に残り、奈緒は美容院へ行った。昼は駅前で待ち合わせた。食後に川まで歩き、前の週に奈緒が見つけたパン屋へ寄った。\n\n家に帰ると、奈緒はソファに座ってイヤホンをつけた。佑介は食卓で、本の続きを開いた。\n\n三十分ほどして、奈緒がこちらを向いた。\n\n「これ見て。すごいんだけど」\n\n佑介は顔を上げた。奈緒がスマートフォンを持って立ちかける。\n\n「あと六ページで、この章が終わる」\n\n「あ、じゃあ、そのあと」\n\n佑介はうなずいて、本へ目を戻した。",
+        "読み終わってソファへ行くと、奈緒は別の動画を観ていた。\n\n「さっきの、どれ？」\n\n「どこいったかな。ちょっと待って」\n\n画面を何度か戻し、見つけたところで奈緒が片方のイヤホンを渡した。佑介はそれを耳につけて、隣に座った。"
+      ],
+      expl: [
+        "「一緒にいたい」と「一人で過ごしたい」が、同じ日のうちに入れ替わる。近くにいると気を使うのに、離れると相手が気になる。恋人との距離を、いつも同じに保つのは難しいものです。\n\n「ヤマアラシ・ジレンマ」は、その難しさを表すたとえです。寒さをしのごうと身を寄せると、互いの針が刺さる。離れると、今度は寒くなる。実験で確かめられた心理効果の名前ではなく、親しくなりたい気持ちと、近づきすぎることへのためらいを表す寓話に由来します。\n\n佑介は、一人で読める時間を喜びながら、奈緒が帰ってこないと気にしていました。奈緒のいる部屋へ戻っても、今度はテレビの音で読めません。別々ならよい、一緒ならよいと、簡単には決まらなかったのです。",
+        "二人で過ごす時間が窮屈に感じられたら、会う時間を大きく減らす前に、何を我慢しているのか確かめてみてください。本を読みたいのか、静かに休みたいのか、一日中話すことに疲れているのか。それによって、変えたい過ごし方も違ってきます。\n\n午前中は別々に過ごす。同じ部屋でも、ときには話しかけずにおく。そう決めても、今日は一緒に出かけたいと思う日もあるでしょう。一度の相談でずっと使える決まりを作ろうとせず、「先週はどうだった？」「今日は何をしたい？」と、その都度確かめながら過ごしてみてください。"
+      ],
+      quiz: {
+        q: "一緒に暮らし始めて、一人で本を読む時間が取りにくい。まず試すなら？",
+        options: ["会う日を大きく減らす","何を我慢しているのか確かめて、午前中は別々に過ごすなど小さく調整する","我慢して今までどおり過ごす"],
+        correct: 1,
+        resultText: "距離の取り方に固定の正解はありません。何に窮屈さを感じているかで、調整の仕方は変わります。その都度確かめながら、小さく変えていくのが続けやすい方法です。"
+      }
+    }
+  ];
+
+  /* カード内スクロールを出さないための分割上限。
+     幅375px・高さ667px級の小さな画面でも本文が全て見えるよう、
+     実際の行数に換算して見積もる（1行あたりの文字数は実際より
+     少なめに見積もり、段落間の余白も高さに含める）。
+     物語：本文エリア約340px分まで／解説：約325px分まで、
+     見出しのある先頭カードは約255px分まで。 */
+  var STORY_SPLIT = { cpl:15, lineH:34, gap:15, budget:335 };
+  var EXPL_SPLIT  = { cpl:16, lineH:32, gap:15, budget:325, firstBudget:255 };
+
+  function splitSentences(p){
+    var out = [];
+    var rest = p;
+    while (rest.length){
+      var m = rest.match(/^[^。]*。/);
+      if (!m){ out.push(rest); break; }
+      out.push(m[0]);
+      rest = rest.slice(m[0].length);
+    }
+    return out;
+  }
+
+  /* テキストの描画高さ(px)の見積もり */
+  function estHeight(text, o){
+    var paras = text.split("\n\n");
+    var h = 0;
+    paras.forEach(function(p, i){
+      h += Math.max(1, Math.ceil(p.length / o.cpl)) * o.lineH;
+      if (i > 0) h += o.gap;
+    });
+    return h;
+  }
+
+  /* 1段落を、文の区切り（。）で上限内に収まるピースに分ける。
+     1文だけで上限を超える場合は読点（、）で分け、それでも長い場合は
+     行数換算の上限字数で切る（現在の文面では発動しない想定の保険）。 */
+  function paraPieces(p, o){
+    var limit = o.firstBudget || o.budget;
+    if (estHeight(p, o) <= limit) return [p];
+    var pieces = [];
+    var cur = "";
+    function pushCur(){ if (cur){ pieces.push(cur); cur = ""; } }
+    splitSentences(p).forEach(function(s){
+      if (estHeight(s, o) > limit){
+        pushCur();
+        var cCur = "";
+        s.split(/(?<=、)/).forEach(function(cl){
+          var maxChars = o.cpl * Math.max(1, Math.floor(limit / o.lineH));
+          while (cl.length > maxChars){
+            if (cCur){ pieces.push(cCur); cCur = ""; }
+            pieces.push(cl.slice(0, maxChars));
+            cl = cl.slice(maxChars);
+          }
+          if (cCur && estHeight(cCur + cl, o) > limit){ pieces.push(cCur); cCur = ""; }
+          cCur += cl;
+        });
+        if (cCur) pieces.push(cCur);
+        return;
+      }
+      if (cur && estHeight(cur + s, o) > limit) pushCur();
+      cur += s;
+    });
+    pushCur();
+    return pieces;
+  }
+
+  /* テキストをカード単位に分割する。物語として自然な切れ目を優先し、
+     流れのつながった段落同士は同じカードにまとめる。段落の途中では
+     切らず、1段落が長い場合のみ文の区切りで分ける。
+     上限は描画高さの見積もりで判定し、カード内でスクロールが
+     発生しない分量に収める。 */
+  function chunkText(text, o){
+    var paras = text.split("\n\n");
+    var chunks = [];
+    var cur = [];
+    var budget = o.firstBudget || o.budget;
+    function flush(){
+      if (cur.length){ chunks.push(cur.join("\n\n")); cur = []; budget = o.budget; }
+    }
+    paras.forEach(function(p){
+      paraPieces(p, o).forEach(function(piece){
+        if (cur.length && estHeight(cur.concat([piece]).join("\n\n"), o) > budget) flush();
+        cur.push(piece);
+      });
+    });
+    flush();
+    return chunks;
+  }
+
+  function buildCards(item){
+    var cards = [{ type:"title", phase:"タイトル" }];
+    /* 場面（シーン）の区切りが最優先の切れ目。シーンをまたいで段落を
+       まとめず、各シーンの中で段落を束ねてカードにする。 */
+    var storyChunks = [];
+    item.story.forEach(function(scene){
+      chunkText(scene, STORY_SPLIT).forEach(function(t){ storyChunks.push(t); });
+    });
+    item.storyCardCount = storyChunks.length;
+    storyChunks.forEach(function(t, i){
+      cards.push({ type:"story", phase:"物語", idx:i+1, total:storyChunks.length, text:t });
+    });
+    var explCards = [];
+    item.expl.forEach(function(text, ei){
+      var chunks = chunkText(text, EXPL_SPLIT);
+      chunks.forEach(function(t, ci){
+        explCards.push({
+          type:"expl", phase:"解説",
+          head:(ei===0?"仕組み":"使い方"),
+          em:(ei===0?item.theme:""),
+          first:(ci===0),
+          text:t
+        });
+      });
+    });
+    item.explCardCount = explCards.length;
+    explCards.forEach(function(c, i){
+      c.idx = i+1; c.total = explCards.length;
+      cards.push(c);
+    });
+    cards.push({ type:"quiz", phase:"確認クイズ" });
+    cards.push({ type:"done", phase:"読了" });
+    return cards;
+  }
+  ITEMS.forEach(function(it){ it.cards = buildCards(it); });
+
+  var hubView = document.getElementById("hubView");
+  var deckView = document.getElementById("deckView");
+  var hubList = document.getElementById("hubList");
+  var hubReadCount = document.getElementById("hubReadCount");
+  var hubTotalCount = document.getElementById("hubTotalCount");
+  var hubBarFill = document.getElementById("hubBarFill");
+  var hubBarWrap = document.getElementById("hubBarWrap");
+
+  var cardEl = document.getElementById("card");
+  var prevBtn = document.getElementById("prevBtn");
+  var nextBtn = document.getElementById("nextBtn");
+  var navRow = document.getElementById("navRow");
+  var backBtn = document.getElementById("backBtn");
+  var curNum = document.getElementById("curNum");
+  var totalNum = document.getElementById("totalNum");
+  var phaseLabel = document.getElementById("phaseLabel");
+  var barFill = document.getElementById("barFill");
+  var barWrap = document.getElementById("barWrap");
+
+  var activeItem = null;
+  var current = 0;
+  var quizAnswered = false;
+  var quizCorrect = false;
+  var quizPicked = -1;
+
+  function isRead(item){
+    try { return localStorage.getItem(item.readKey) === "1"; } catch(e){ return false; }
+  }
+  function markRead(item){
+    try {
+      localStorage.setItem(item.readKey,"1");
+      localStorage.setItem(item.readAtKey, new Date().toISOString());
+    } catch(e){}
+  }
+
+  function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function paras(text){
+    return text.split("\n\n").map(function(p){ return "<p>" + esc(p) + "</p>"; }).join("");
+  }
+
+  function dotsHTML(total, idx){
+    var h = '<span class="dots" aria-hidden="true">';
+    for (var i=1;i<=total;i++){ h += '<i class="'+(i===idx?'on':'')+'"></i>'; }
+    return h + '</span>';
+  }
+
+  /* ===== hub ===== */
+  function renderHub(){
+    var readCount = 0;
+    var html = "";
+    ITEMS.forEach(function(item, idx){
+      var read = isRead(item);
+      if (read) readCount++;
+      html +=
+        '<button type="button" class="hub-item" data-idx="'+idx+'">' +
+          '<span class="i-top"><span class="i-no">'+esc(item.no)+'</span>' +
+          '<span class="i-badge '+(read?'read':'unread')+'">'+(read?'読了':'未読')+'</span></span>' +
+          '<span class="i-theme" style="display:block">'+esc(item.theme)+'</span>' +
+          '<span class="i-story" style="display:block">'+esc(item.storyTitle)+'</span>' +
+          '<span class="i-meta"><span>作：遊さん ・ 全'+item.cards.length+'枚</span><span class="i-open">'+(read?'もう一度読む':'読む')+' ›</span></span>' +
+        '</button>';
+    });
+    hubList.innerHTML = html;
+    hubReadCount.textContent = String(readCount);
+    hubTotalCount.textContent = String(ITEMS.length);
+    hubBarFill.style.width = (ITEMS.length ? (readCount / ITEMS.length * 100) : 0) + "%";
+    hubBarWrap.setAttribute("aria-valuemax", String(ITEMS.length));
+    hubBarWrap.setAttribute("aria-valuenow", String(readCount));
+
+    var btns = hubList.querySelectorAll(".hub-item");
+    for (var k=0;k<btns.length;k++){
+      btns[k].addEventListener("click", function(){
+        var idx = parseInt(this.getAttribute("data-idx"), 10);
+        openDeck(ITEMS[idx]);
+      });
+    }
+  }
+
+  function showHub(){
+    activeItem = null;
+    deckView.hidden = true;
+    hubView.hidden = false;
+    renderHub();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function openDeck(item){
+    activeItem = item;
+    current = 0;
+    quizAnswered = false;
+    quizCorrect = false;
+    quizPicked = -1;
+    hubView.hidden = true;
+    deckView.hidden = false;
+    totalNum.textContent = String(item.cards.length);
+    barWrap.setAttribute("aria-valuemax", String(item.cards.length));
+    render("");
+  }
+
+  /* ===== deck ===== */
+  function render(dir){
+    if (!activeItem) return;
+    var cards = activeItem.cards;
+    var TOTAL = cards.length;
+    var c = cards[current];
+    var html = "";
+
+    if (c.type === "title"){
+      html =
+        '<div class="kicker"><span class="tag">心理学インプット教材</span>' +
+        (isRead(activeItem) ? '<span class="done-badge">読了済み</span>' : '') + '</div>' +
+        '<p class="t-no">' + esc(activeItem.no) + '</p>' +
+        '<h1 class="t-title">' + esc(activeItem.theme) + '</h1>' +
+        '<div class="t-underline"></div>' +
+        '<div class="story-box"><div class="s-label">小説</div>' +
+        '<div class="s-title">' + esc(activeItem.storyTitle) + '</div>' +
+        '<div class="s-author">作：遊さん</div></div>' +
+        '<ul class="flow">' +
+        '<li><span class="n">1</span><div><b>物語</b>　<span>全' + activeItem.storyCardCount + '枚を1枚ずつ読む</span></div></li>' +
+        '<li><span class="n">2</span><div><b>解説</b>　<span>仕組みと使い方を' + activeItem.explCardCount + '枚で</span></div></li>' +
+        '<li><span class="n">3</span><div><b>クイズ</b>　<span>3択1問、その場で答え合わせ</span></div></li>' +
+        '</ul>' +
+        '<p class="tap-hint">タップで物語が始まります</p>';
+    }
+    else if (c.type === "story"){
+      html =
+        '<div class="kicker"><span class="tag">物語</span><span class="sub-tag">' + esc(activeItem.storyTitle) + ' ' + c.idx + ' / ' + c.total + '</span></div>' +
+        '<div class="body-text">' + paras(c.text) + '</div>' +
+        '<div class="card-foot">' + dotsHTML(c.total, c.idx) + '</div>';
+    }
+    else if (c.type === "expl"){
+      var secLabel = c.head + (c.first ? "" : "（つづき）");
+      var headHtml = "";
+      if (c.first){
+        var head = c.em
+          ? '仕組み ― <em>' + esc(c.em) + '</em>とは'
+          : esc(activeItem.expl2Head);
+        headHtml = '<h2 class="expl-head">' + head + '</h2>';
+      }
+      html =
+        '<div class="kicker"><span class="tag">解説</span><span class="sub-tag">' + c.idx + ' / ' + c.total + ' ・ ' + esc(secLabel) + '</span></div>' +
+        headHtml +
+        '<div class="body-text small">' + paras(c.text) + '</div>' +
+        '<div class="card-foot"><span>解説 ' + c.idx + ' / ' + c.total + '</span>' + dotsHTML(c.total, c.idx) + '</div>';
+    }
+    else if (c.type === "quiz"){
+      var q = activeItem.quiz;
+      html =
+        '<div class="kicker"><span class="tag">確認クイズ</span><span class="sub-tag">3択 ・ 1問</span></div>' +
+        '<p class="q-text">' + esc(q.q) + '</p>' +
+        '<div class="options" id="quizOptions">' +
+          quizOption(0,"1",q.options[0]) +
+          quizOption(1,"2",q.options[1]) +
+          quizOption(2,"3",q.options[2]) +
+        '</div>' +
+        '<div class="quiz-result" id="quizResult" role="status"></div>' +
+        '<div class="card-foot"><span>選ぶと、その場で答え合わせ</span></div>';
+    }
+    else if (c.type === "done"){
+      html =
+        '<div class="done-wrap">' +
+        '<div class="done-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5.2 5L20 6.5" stroke="#101c31" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+        '<h2 class="done-title">' + esc(activeItem.no) + ' ' + esc(activeItem.theme) + '<br>読了</h2>' +
+        '<p class="done-sub">' + (quizAnswered ? (quizCorrect ? 'クイズは正解でした' : 'クイズの解説もあわせて確認しました') : '') + '</p>' +
+        '<button class="btn btn-restart" id="restartBtn" type="button">最初に戻る</button>' +
+        '<button class="btn btn-tolist" id="toListBtn" type="button">一覧に戻る</button>' +
+        '</div>';
+    }
+
+    cardEl.innerHTML = html;
+    cardEl.classList.toggle("quiz-answered", c.type === "quiz" && quizAnswered);
+    cardEl.classList.remove("anim-next","anim-prev");
+    if (dir === "next") cardEl.classList.add("anim-next");
+    if (dir === "prev") cardEl.classList.add("anim-prev");
+
+    curNum.textContent = String(current + 1);
+    phaseLabel.textContent = c.phase + (c.type==="expl" ? " " + c.idx + "/" + c.total : "");
+    barFill.style.width = ((current + 1) / TOTAL * 100) + "%";
+    barWrap.setAttribute("aria-valuenow", String(current + 1));
+
+    var isDone = c.type === "done";
+    navRow.style.display = isDone ? "none" : "flex";
+    prevBtn.disabled = current === 0;
+    if (c.type === "quiz"){
+      nextBtn.textContent = "読了へ →";
+      nextBtn.disabled = !quizAnswered;
+    } else if (current === 0){
+      nextBtn.textContent = "物語をはじめる →";
+      nextBtn.disabled = false;
+    } else {
+      nextBtn.textContent = "次へ →";
+      nextBtn.disabled = false;
+    }
+
+    if (c.type === "quiz") bindQuiz();
+    if (c.type === "done"){
+      markRead(activeItem);
+      var rb = document.getElementById("restartBtn");
+      if (rb) rb.addEventListener("click", function(e){ e.stopPropagation(); goTo(0, "prev"); });
+      var lb = document.getElementById("toListBtn");
+      if (lb) lb.addEventListener("click", function(e){ e.stopPropagation(); showHub(); });
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function quizOption(i, num, label){
+    var cls = "opt";
+    var disabled = "";
+    if (quizAnswered){
+      disabled = " disabled";
+      if (i === activeItem.quiz.correct) cls += " correct";
+      else if (i === quizPicked) cls += " wrong";
+      else cls += " dim";
+    }
+    return '<button type="button" class="'+cls+'" data-i="'+i+'"'+disabled+'><span class="num">'+num+'</span><span>'+esc(label)+'</span></button>';
+  }
+
+  function bindQuiz(){
+    var box = document.getElementById("quizOptions");
+    var result = document.getElementById("quizResult");
+    var q = activeItem.quiz;
+    var correctLabel = q.options[q.correct];
+    var circled = ["①","②","③"][q.correct];
+    if (quizAnswered && result){
+      result.className = "quiz-result show " + (quizCorrect ? "ok" : "ng");
+      result.innerHTML = '<div class="r-head">' + (quizCorrect ? "正解 ― " + circled + " " + esc(correctLabel) : "正解は " + circled + " ― " + esc(correctLabel)) + '</div>' +
+        esc(q.resultText);
+    }
+    if (!box) return;
+    var btns = box.querySelectorAll(".opt");
+    for (var k=0;k<btns.length;k++){
+      btns[k].addEventListener("click", function(e){
+        e.stopPropagation();
+        if (quizAnswered) return;
+        var i = parseInt(this.getAttribute("data-i"), 10);
+        quizPicked = i;
+        quizAnswered = true;
+        quizCorrect = (i === activeItem.quiz.correct);
+        render();
+      });
+    }
+  }
+
+  function canNext(){
+    if (!activeItem) return false;
+    var c = activeItem.cards[current];
+    if (c.type === "quiz" && !quizAnswered) return false;
+    return current < activeItem.cards.length - 1;
+  }
+  function goNext(){ if (canNext()){ current++; render("next"); } }
+  function goPrev(){ if (activeItem && current > 0){ current--; render("prev"); } }
+  function goTo(i, dir){ current = i; render(dir || ""); }
+
+  backBtn.addEventListener("click", function(){ showHub(); });
+  prevBtn.addEventListener("click", function(e){ e.stopPropagation(); goPrev(); });
+  nextBtn.addEventListener("click", function(e){ e.stopPropagation(); goNext(); });
+
+  cardEl.addEventListener("click", function(e){
+    if (!activeItem) return;
+    if (e.target.closest("button")) return;
+    var c = activeItem.cards[current];
+    if (c.type === "done") return;
+    if (c.type === "quiz") return;
+    var rect = cardEl.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    if (x < rect.width * 0.22) goPrev(); else goNext();
+  });
+
+  var touchX = null, touchY = null;
+  cardEl.addEventListener("touchstart", function(e){
+    if (e.touches.length === 1){ touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; }
+  }, { passive:true });
+  cardEl.addEventListener("touchend", function(e){
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    var dy = e.changedTouches[0].clientY - touchY;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4){
+      if (dx < 0) goNext(); else goPrev();
+    }
+    touchX = null; touchY = null;
+  }, { passive:true });
+
+  /* 誤ダブルタップ／ダブルクリックでの拡大防止（補助）。
+     viewport と touch-action が効かない環境向けの保険。
+     ボタン類は対象外にし、連打での回答・ページ送りを妨げない */
+  document.addEventListener("gesturestart", function(e){ e.preventDefault(); });
+  document.addEventListener("dblclick", function(e){ e.preventDefault(); }, { passive:false });
+  var lastTouchEnd = 0;
+  document.addEventListener("touchend", function(e){
+    if (e.target.closest && e.target.closest("button")) return;
+    var now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive:false });
+
+  document.addEventListener("keydown", function(e){
+    if (!activeItem) return;
+    if (e.key === "ArrowRight") goNext();
+    if (e.key === "ArrowLeft") goPrev();
+    if (e.key === "Escape") showHub();
+  });
+
+  showHub();
+})();
+</script>
+</body>
+</html>

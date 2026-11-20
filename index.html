@@ -259,7 +259,10 @@
   }
 </style>
 <style>html.pg-locked body{visibility:hidden}html.pg-locked #pgGate{visibility:visible}</style>
-<script>document.documentElement.classList.add('pg-locked');</script>
+<script>
+document.documentElement.classList.add('pg-locked');
+try { var __pgLt = new URLSearchParams(location.hash.slice(1)).get('lt'); if (__pgLt) localStorage.setItem('prograv_lt', __pgLt); } catch (e) {}
+</script>
 </head>
 <body>
 <main class="wrap">
